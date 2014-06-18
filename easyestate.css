@@ -20,6 +20,7 @@ body {
         a { color: #809bc0; }
         .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
         .download { float: right; }
+        
         /* one selector per rule as explained here : http://www.sitepoint.com/html5-full-screen-api/ */
         #map:-webkit-full-screen { width: 100% !important; height: 100% !important; z-index: 99999; }
         #map:-moz-full-screen { width: 100% !important; height: 100% !important; z-index: 99999; }
