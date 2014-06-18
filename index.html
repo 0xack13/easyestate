@@ -67,19 +67,10 @@
             maxZoom: 18,
             }).addTo(map);
 
-        var marker = L.marker([-41.29042, 174.78219])
-            .addTo(map);
         var marker = L.marker([-41.29040, 174.78218])
             .addTo(map)
             .bindPopup("<b>Te Papa</b><br>Museum of New Zealand.")
             .openPopup();
-
-        var marker = L.marker([-41.29052, 174.78219],
-        {option1: true,                 // a boolean value
-        option2: 'a string lives here', // a string
-        option3: 1234}                  // a number
-        )
-       .addTo(map);
 
        map.on('click', function(e) {
             //alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng);
@@ -102,16 +93,15 @@
               marker.bindPopup(form).openPopup();
         });
 
-       //draggable
+       //draggable marker
        var marker = L.marker([-41.29092, 174.78219],
-        {draggable: true}
-        )
+        {
+            draggable: true
+        })
        .addTo(map);
 
        L.control.scale().addTo(map);
        map.attributionControl.setPrefix('<a href="http://www.Aqarholic.org/">Aqarholic</a>');
-
-
 
         // create fullscreen control
         var fullScreen = new L.Control.FullScreen();
