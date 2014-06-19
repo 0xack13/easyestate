@@ -26,10 +26,26 @@
         src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js">
     </script>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+    <script type="text/javascript" src="leaflet.markercluster.js"></script>
     <script src="https://rawgithub.com/brunob/leaflet.fullscreen/master/Control.FullScreen.js"></script>
     <script src="sample-geojson.js"></script>
     <script>
-        var map = L.map('map').setView([-41.2858, 174.78682], 14);
+        var newUser, users, mapquest, firstLoad;
+        newUser = new L.LayerGroup();
+        users = new L.MarkerClusterGroup({spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true});
+        mapquest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        subdomains: ["otile1", "otile2", "otile3", "otile4"],
+        attribution: 'Basemap tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">. Map data (c) <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors, CC-BY-SA.'
+        });
+
+        //var map = L.map('map').setView([-41.2858, 174.78682], 14);
+        map = new L.Map('map', {
+            center: new L.LatLng(39.90973623453719, -93.69140625),
+            zoom: 8,
+            layers: [mapquest, users, newUser]
+        });
+
         mapLink = 
             '<a href="http://openstreetmap.org">OpenStreetMap</a>';
         L.tileLayer(
@@ -37,13 +53,19 @@
             attribution: '&copy; ' + mapLink + ' Contributors',
             maxZoom: 18,
             }).addTo(map);
-
+        /*
         var marker = L.marker([-41.29040, 174.78218])
             .addTo(map)
             .bindPopup("<b>Te Papa</b><br>Museum of New Zealand.")
             .openPopup();
+        */
+
 
        map.on('click', function(e) {
+            var markerLocation = new L.LatLng(e.latlng.lat, e.latlng.lng);
+            marker = new L.Marker(markerLocation);
+            newUser.clearLayers();
+            newUser.addLayer(marker);
             //alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng);
             var form =  '<form id="inputform" enctype="multipart/form-data" class="well">'+
               '<label><strong>Name:</strong> <i>marker title</i></label>'+
@@ -54,8 +76,8 @@
               '<input type="text" class="span3" placeholder="Optional" id="city" name="city" />'+
               '<label><strong>Website:</strong></label>'+
               '<input type="text" class="span3" placeholder="Optional" id="website" name="website" value="http://" />'+
-              '<input style="display: show;" type="text" id="lat" name="lat" value="' + e.latlng.lat.toFixed(6) + "' />'"+
-              '<input style="display: show;" type="text" id="lng" name="lng" value="' + e.latlng.lng.toFixed(6) + "' /><br><br>'"+
+              '<input style="display: show;" type="text" id="lat" name="lat" value="'+e.latlng.lat.toFixed(6)+'" />'+
+              '<input style="display: show;" type="text" id="lng" name="lng" value="'+e.latlng.lng.toFixed(6)+'" /><br><br>'+
               '<div class="row-fluid">'+
                 '<div class="span6" style="text-align:center;"><button type="button" class="btn" onclick="cancelRegistration()">Cancel</button></div>'+
                 '<div class="span6" style="text-align:center;"><button type="button" class="btn btn-primary" onclick="insertUser()">Submit</button></div>'+
@@ -63,13 +85,15 @@
               '</form>';
               marker.bindPopup(form).openPopup();
         });
-
+        
        //draggable marker
+       /*
        var marker = L.marker([-41.29092, 174.78219],
         {
             draggable: true
         })
        .addTo(map);
+       */
 
        L.control.scale().addTo(map);
        map.attributionControl.setPrefix('<a href="http://www.Aqarholic.org/">Aqarholic</a>');
@@ -100,7 +124,7 @@
         ["C820AB",-42.08414,173.96632],
         ["C820B6",-41.51285,173.53274]
         ];
-
+        /*
         var form =  '<form id="inputform" enctype="multipart/form-data" class="well">'+
               '<label><strong>Name:</strong> <i>marker title</i></label>'+
               '<input type="text" class="span3" placeholder="Required" id="name" name="name" />'+
@@ -110,21 +134,21 @@
               '<input type="text" class="span3" placeholder="Optional" id="city" name="city" />'+
               '<label><strong>Website:</strong></label>'+
               '<input type="text" class="span3" placeholder="Optional" id="website" name="website" value="http://" />'+
-              '<input style="display: none;" type="text" id="lat" name="lat" value="e.latlng.lat.toFixed(6)+" />'+
-              '<input style="display: none;" type="text" id="lng" name="lng" value="e.latlng.lng.toFixed(6)+" /><br><br>'+
+              '<input style="display: none;" type="text" id="lat" name="lat" value="' + e.latlng.lat.toFixed(6) + "' />'"+
+              '<input style="display: none;" type="text" id="lng" name="lng" value="' + e.latlng.lng.toFixed(6) + "' /><br><br>'"+
               '<div class="row-fluid">'+
                 '<div class="span6" style="text-align:center;"><button type="button" class="btn" onclick="cancelRegistration()">Cancel</button></div>'+
                 '<div class="span6" style="text-align:center;"><button type="button" class="btn btn-primary" onclick="insertUser()">Submit</button></div>'+
               '</div>'+
               '</form>';
-        //marker.bindPopup(form).openPopup();
+        marker.bindPopup(form).openPopup();
 
         for (var i = 0; i < planes.length; i++) {
             marker = new L.marker([planes[i][1],planes[i][2]])
                 //.bindPopup(planes[i][0])
                 .bindPopup(form).openPopup()
                 .addTo(map);
-        }
+        }*/
 
 
         //Using GeoJSON in Leaflet Library
@@ -205,6 +229,12 @@
             onEachFeature: onEachFeature
 
         }).addTo(map);
+
+        function cancelRegistration() {
+        newUser.clearLayers();
+        $('#map').css('cursor', '');
+        map.removeEventListener('click', onMapClick);
+        }
 
 
     </script>
