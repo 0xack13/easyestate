@@ -5,6 +5,7 @@ body {
         html, body, #map {
             height: 100%;
             width: 100%;
+            font-family: 'Vollkorn', serif;
         }
         
         .leaflet-popup-close-button { color: #BCB9A4;}

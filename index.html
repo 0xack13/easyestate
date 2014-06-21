@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>EasyMap For Real Estate Management</title>
+    <title>Real estate management has never been easier..</title>
     <meta charset="utf-8" />
-    <link 
-        rel="stylesheet" 
-        href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"
-    />
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="leaflet.draw.css" />
     <link type="text/css" rel="stylesheet" href="bootstrap.css" />
     <link type="text/css" rel="stylesheet" href="easyestate.css">
@@ -32,8 +30,19 @@
     <script type="text/javascript" src="leaflet.markercluster.js"></script>
     <script src="https://rawgithub.com/brunob/leaflet.fullscreen/master/Control.FullScreen.js"></script>
     <script src="sample-geojson.js"></script>
+    <!-- <script type="easyestate.js"></script> -->
     <script>
         var newUser, users, mapquest, firstLoad;
+
+        var Personal = new L.LayerGroup();
+
+        L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.').addTo(Personal),
+        L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.').addTo(Personal),
+        L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.').addTo(Personal),
+        L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.').addTo(Personal);
+
+
+
         newUser = new L.LayerGroup();
         users = new L.MarkerClusterGroup({spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true});
         mapquest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
@@ -42,12 +51,44 @@
         attribution: 'Easymaps Inc.'
         });
 
+
+
+        var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            mbUrl = 'https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png';
+
+        var grayscale   = L.tileLayer(mbUrl, {id: 'examples.map-20v6611k', attribution: mbAttr}),
+            streets  = L.tileLayer(mbUrl, {id: 'examples.map-i86knfo3',   attribution: mbAttr});
+
+        var baseLayers = {
+            "Read Gray": grayscale,
+            "Read Street": streets,
+            "Edit Mode": newUser
+        };
+
+        var overlays = {
+            "Personl": Personal
+        };
+
+
         //var map = L.map('map').setView([-41.2858, 174.78682], 14);
         map = new L.Map('map', {
             center: new L.LatLng(39.90973623453719, -93.69140625),
             zoom: 8,
-            layers: [mapquest, users, newUser]
+            layers: [grayscale, Personal]
         });
+
+        L.control.layers(baseLayers, overlays).addTo(map);
+
+
+
+
+
+
+
+
+
 
         mapLink = 
             '<a href="http://openstreetmap.org">OpenStreetMap</a>';
