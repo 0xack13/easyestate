@@ -7,18 +7,20 @@
         rel="stylesheet" 
         href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"
     />
+    <link rel="stylesheet" href="leaflet.draw.css" />
     <link type="text/css" rel="stylesheet" href="bootstrap.css" />
     <link type="text/css" rel="stylesheet" href="easyestate.css">
 </head>
 <body>
+
     <div id="navmenu">
-<ul>
-    <li><a href="http://www.google.com">Home</a></li>
-    <li><a href="wordpress/recipes/">Maps</a></li>
-    <li><a href="wordpress/travel/">Search</a></li>
-    <li><a href="http://www.wordpress.org">About us</a></li>
-</ul>
-</div>
+        <ul>
+            <li><a href="http://www.google.com">Home</a></li>
+            <li><a href="wordpress/recipes/">Maps</a></li>
+            <li><a href="wordpress/travel/">Search</a></li>
+            <li><a href="http://www.wordpress.org">About us</a></li>
+        </ul>
+    </div>
     <!-- Main Map div - Watchout! -->
     <div id="map"></div>
 
@@ -26,6 +28,7 @@
         src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js">
     </script>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+    <script src="leaflet.draw.js"></script>
     <script type="text/javascript" src="leaflet.markercluster.js"></script>
     <script src="https://rawgithub.com/brunob/leaflet.fullscreen/master/Control.FullScreen.js"></script>
     <script src="sample-geojson.js"></script>
@@ -36,7 +39,7 @@
         mapquest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
         maxZoom: 18,
         subdomains: ["otile1", "otile2", "otile3", "otile4"],
-        attribution: 'Basemap tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">. Map data (c) <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors, CC-BY-SA.'
+        attribution: 'Easymaps Inc.'
         });
 
         //var map = L.map('map').setView([-41.2858, 174.78682], 14);
@@ -50,7 +53,6 @@
             '<a href="http://openstreetmap.org">OpenStreetMap</a>';
         L.tileLayer(
             'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; ' + mapLink + ' Contributors',
             maxZoom: 18,
             }).addTo(map);
         /*
@@ -60,8 +62,30 @@
             .openPopup();
         */
 
+        // Initialise the FeatureGroup to store editable layers
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
 
-       map.on('click', function(e) {
+        // Initialise the draw control and pass it the FeatureGroup of editable layers
+        var drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: drawnItems
+            }
+        });
+        map.addControl(drawControl);
+
+        map.on('draw:created', function (e) {
+            var type = e.layerType,
+                layer = e.layer;
+
+            if (type === 'marker') {
+                layer.bindPopup('A popup!');
+            }
+
+            drawnItems.addLayer(layer);
+        });
+
+       map.on('contextmenu', function(e) {
             var markerLocation = new L.LatLng(e.latlng.lat, e.latlng.lng);
             marker = new L.Marker(markerLocation);
             newUser.clearLayers();
@@ -96,7 +120,7 @@
        */
 
        L.control.scale().addTo(map);
-       map.attributionControl.setPrefix('<a href="http://www.Aqarholic.org/">Aqarholic</a>');
+        map.attributionControl.setPrefix('<a href="http://www.Aqarholic.org/">Aqarholic</a>');
 
         // create fullscreen control
         var fullScreen = new L.Control.FullScreen();
