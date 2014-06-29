@@ -28,3 +28,38 @@ body {
         .leaflet-pseudo-fullscreen { position: fixed !important; width: 100% !important; height: 100% !important; top: 0px !important; left: 0px !important; z-index: 99999; }
         .leaflet-control-zoom-fullscreen { background-image: url(https://github.com/brunob/leaflet.fullscreen/raw/master/icon-fullscreen.png); }
         .leaflet-retina .leaflet-control-zoom-fullscreen { background-image: url(https://github.com/brunob/leaflet.fullscreen/raw/master/icon-fullscreen-2x.png); background-size: 26px 26px; }
+
+
+* {
+            padding: 0;
+            margin: 0;
+        }
+
+        body,html {
+            height: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+        }
+
+        * html #map {
+            height: 100%;
+        }
+
+        #box {
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            background-color: white; 
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        #box img {
+            margin-left: 20px;
+            margin-right: 5px;
+            cursor: pointer;
+        }
