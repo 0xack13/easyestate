@@ -1,68 +1,122 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>EasyMap For Real Estate Management</title>
+    <title>Real estate management has never been easier..</title>
     <meta charset="utf-8" />
+<<<<<<< HEAD
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
     <link 
         rel="stylesheet" 
         href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"
     />
+=======
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="leaflet.draw.css" />
+>>>>>>> 0d22eff15218533df042be3a0d6e369980ce695b
     <link type="text/css" rel="stylesheet" href="bootstrap.css" />
     <link type="text/css" rel="stylesheet" href="easyestate.css">
 </head>
 <body>
+
     <div id="navmenu">
-<ul>
-    <li><a href="http://www.google.com">Home</a></li>
-    <li><a href="wordpress/recipes/">Maps</a></li>
-    <li><a href="wordpress/travel/">Search</a></li>
-    <li><a href="http://www.wordpress.org">About us</a></li>
-</ul>
-</div>
+        <ul>
+            <li><a href="http://www.google.com">Home</a></li>
+            <li><a href="wordpress/recipes/">Maps</a></li>
+            <li><a href="wordpress/travel/">Search</a></li>
+            <li><a href="http://www.wordpress.org">About us</a></li>
+        </ul>
+    </div>
+
     <!-- Main Map div - Watchout! -->
     <div id="map"></div>
 
     <script
         src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js">
     </script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+    <script src="leaflet.draw.js"></script>
     <script type="text/javascript" src="leaflet.markercluster.js"></script>
     <script src="https://rawgithub.com/brunob/leaflet.fullscreen/master/Control.FullScreen.js"></script>
     <script src="sample-geojson.js"></script>
+    <!-- <script type="easyestate.js"></script> -->
     <script>
         var newUser, users, mapquest, firstLoad;
+
+        var Personal = new L.LayerGroup();
+
+        L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.').addTo(Personal),
+        L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.').addTo(Personal),
+        L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.').addTo(Personal),
+        L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.').addTo(Personal);
+
         newUser = new L.LayerGroup();
         users = new L.MarkerClusterGroup({spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true});
         mapquest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
         maxZoom: 18,
         subdomains: ["otile1", "otile2", "otile3", "otile4"],
-        attribution: 'Basemap tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">. Map data (c) <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors, CC-BY-SA.'
+        attribution: 'Easymaps Inc.'
         });
 
-        //var map = L.map('map').setView([-41.2858, 174.78682], 14);
+        var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            mbUrl = 'https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png';
+
+        var grayscale   = L.tileLayer(mbUrl, {id: 'examples.map-20v6611k', attribution: mbAttr}),
+            streets  = L.tileLayer(mbUrl, {id: 'examples.map-i86knfo3',   attribution: mbAttr});
+
+        var baseLayers = {
+            "Read Gray": grayscale,
+            "Read Street": streets,
+            "Edit Mode": newUser
+        };
+
+        var overlays = {
+            "Personl": Personal
+        };
+
         map = new L.Map('map', {
             center: new L.LatLng(39.90973623453719, -93.69140625),
             zoom: 8,
-            layers: [mapquest, users, newUser]
+            layers: [grayscale, Personal]
         });
+
+        L.control.layers(baseLayers, overlays).addTo(map);
+
 
         mapLink = 
             '<a href="http://openstreetmap.org">OpenStreetMap</a>';
         L.tileLayer(
             'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; ' + mapLink + ' Contributors',
             maxZoom: 18,
             }).addTo(map);
-        /*
-        var marker = L.marker([-41.29040, 174.78218])
-            .addTo(map)
-            .bindPopup("<b>Te Papa</b><br>Museum of New Zealand.")
-            .openPopup();
-        */
 
+        // Initialise the FeatureGroup to store editable layers
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
 
-       map.on('click', function(e) {
+        // Initialise the draw control and pass it the FeatureGroup of editable layers
+        var drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: drawnItems
+            }
+        });
+        map.addControl(drawControl);
+
+        map.on('draw:created', function (e) {
+            var type = e.layerType,
+                layer = e.layer;
+
+            if (type === 'marker') {
+                layer.bindPopup('A popup!');
+            }
+
+            drawnItems.addLayer(layer);
+        });
+
+       map.on('contextmenu', function(e) {
             var markerLocation = new L.LatLng(e.latlng.lat, e.latlng.lng);
             marker = new L.Marker(markerLocation);
             newUser.clearLayers();
@@ -86,18 +140,9 @@
               '</form>';
               marker.bindPopup(form).openPopup();
         });
-        
-       //draggable marker
-       /*
-       var marker = L.marker([-41.29092, 174.78219],
-        {
-            draggable: true
-        })
-       .addTo(map);
-       */
 
        L.control.scale().addTo(map);
-       map.attributionControl.setPrefix('<a href="http://www.Aqarholic.org/">Aqarholic</a>');
+        map.attributionControl.setPrefix('<a href="http://www.Aqarholic.org/">Aqarholic</a>');
 
         // create fullscreen control
         var fullScreen = new L.Control.FullScreen();
@@ -125,32 +170,6 @@
         ["C820AB",-42.08414,173.96632],
         ["C820B6",-41.51285,173.53274]
         ];
-        /*
-        var form =  '<form id="inputform" enctype="multipart/form-data" class="well">'+
-              '<label><strong>Name:</strong> <i>marker title</i></label>'+
-              '<input type="text" class="span3" placeholder="Required" id="name" name="name" />'+
-              '<label><strong>Email:</strong> <i>never shared</i></label>'+
-              '<input type="text" class="span3" placeholder="Required" id="email" name="email" />'+
-              '<label><strong>City:</strong></label>'+
-              '<input type="text" class="span3" placeholder="Optional" id="city" name="city" />'+
-              '<label><strong>Website:</strong></label>'+
-              '<input type="text" class="span3" placeholder="Optional" id="website" name="website" value="http://" />'+
-              '<input style="display: none;" type="text" id="lat" name="lat" value="' + e.latlng.lat.toFixed(6) + "' />'"+
-              '<input style="display: none;" type="text" id="lng" name="lng" value="' + e.latlng.lng.toFixed(6) + "' /><br><br>'"+
-              '<div class="row-fluid">'+
-                '<div class="span6" style="text-align:center;"><button type="button" class="btn" onclick="cancelRegistration()">Cancel</button></div>'+
-                '<div class="span6" style="text-align:center;"><button type="button" class="btn btn-primary" onclick="insertUser()">Submit</button></div>'+
-              '</div>'+
-              '</form>';
-        marker.bindPopup(form).openPopup();
-
-        for (var i = 0; i < planes.length; i++) {
-            marker = new L.marker([planes[i][1],planes[i][2]])
-                //.bindPopup(planes[i][0])
-                .bindPopup(form).openPopup()
-                .addTo(map);
-        }*/
-
 
         //Using GeoJSON in Leaflet Library
         var geojsonFeature = {
@@ -167,6 +186,21 @@
         };
 
 
+        //Geojson GET call
+        $.ajax({
+            type: "get",
+            url: "http://localhost:8000/rows.json",
+            dataType: 'json',
+            success: function (response) {
+
+                geojsonLayer = L.geoJson(response, {
+                    //style: yourLeafletStyle
+                    style: function (feature) {
+                return feature.properties && feature.properties.style;
+                },
+                }).addTo(map);
+            }
+        });
 
         var baseballIcon = L.icon({
             iconUrl: 'baseball-marker.png',
@@ -236,8 +270,6 @@
         $('#map').css('cursor', '');
         map.removeEventListener('click', onMapClick);
         }
-
-
     </script>
 </body>
 </html>

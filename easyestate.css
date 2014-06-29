@@ -5,19 +5,38 @@ body {
         html, body, #map {
             height: 100%;
             width: 100%;
+            font-family: 'Vollkorn', serif;
+
         }
+
+         .comp {
+             background-image: url(image.png);
+         }
+
+         @media only screen and (min-resolution: 2dppx) {
+             .comp {
+                 background-image: url(image@2x.png);
+             }
+         }
         
-        #navmenu ul {margin: 0; padding: 0; 
+        .leaflet-popup-close-button { color: #BCB9A4;}
+        
+        #inputform, .leaflet-popup-content-wrapper, .leaflet-popup-tip { 
+            background-color: #BCB9A4;
+            opacity: 0.8;
+        }
+        #navmenu { background-color: #BCB9A4; }
+        #navmenu ul {margin: 0; padding: 0; height: 3%; 
         list-style-type: none; list-style-image: none; }
         #navmenu li {display: inline; padding: 5px 20px 5px 20px}
-        #navmenu a {text-decoration:none; color: blue; }
+        #navmenu a {text-decoration:none; color: black; }
         #navmenu a:hover {color: purple; }
 
         h1 { font-size: 3.8em; color: #809bc0; margin-bottom: 3px; }
         h1 a { text-decoration: none }
         h2 { font-size: 1.5em; color: #809bc0; }
         h3 { text-align: center; color: #809bc0; }
-        a { color: #809bc0; }
+        a { color: black; }
         .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
         .download { float: right; }
         
