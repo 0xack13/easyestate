@@ -1,5 +1,5 @@
  L.LabelOverlay = L.Class.extend({
-        initialize: function(/*LatLng*/ latLng, /*String*/ label, options) {
+        initialize: function(latLng, label, options) {
             this._latlng = latLng;
             this._label = label;
             L.Util.setOptions(this, options);
