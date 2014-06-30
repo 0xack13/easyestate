@@ -34,6 +34,7 @@
     <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
     <script src="leaflet.draw.js"></script>
     <script src="leaflet-button-control.js"></script>
+    <script src="labeloverlay.js"></script>
     <script type="text/javascript" src="leaflet.markercluster.js"></script>
     <script src="https://rawgithub.com/brunob/leaflet.fullscreen/master/Control.FullScreen.js"></script>
     <script src="sample-geojson.js"></script>
@@ -91,7 +92,7 @@
             }).addTo(map);
 
             var myButtonOptions = {
-                'text': 'MyButton',  // string
+                'text': '',  // string
                 'iconUrl': 'icons/poi_red.png',  // string
                 'onClick': my_button_onClick,  // callback function
                 'hideText': true,  // bool
@@ -125,16 +126,46 @@
             },
 
             onAdd: function (map) {
+                var className = 'leaflet-control-help';
                 // create the control container with a particular class name
                 var container = L.DomUtil.create('div', 'my-custom-control');
+                var link = L.DomUtil.create('a', className + '-button', container);
+                link.href = '#';
+                link.title = 'Hello Button';
 
                 // ... initialize other DOM elements, add listeners, etc.
 
                 return container;
             }
-    });
+        });
+        map.addControl(new MyControl());
 
-    map.addControl(new MyControl());
+
+
+
+        var labelLocation = new L.LatLng(51.329219337279405, 10.454119349999928);
+        var labelTitle = new L.LabelOverlay(labelLocation, '<b>GERMANY</b>');
+        map.addLayer(labelTitle);
+
+
+        var labelLocation2 = new L.LatLng(47.71329162782909, 13.34573480000006);
+        var labelTitle2 = new L.LabelOverlay(labelLocation2, '<b>AUSTRIA</b>');
+        map.addLayer(labelTitle2);
+
+        // In order to prevent the text labels to "jump" when zooming in and out,
+        // in Google Chrome, I added this event handler:
+
+        map.on('movestart', function () {
+            map.removeLayer(labelTitle);
+            map.removeLayer(labelTitle2);
+        });
+        map.on('moveend', function () {
+            map.addLayer(labelTitle);
+            map.addLayer(labelTitle2);
+        });
+
+
+
 
         map.on('draw:created', function (e) {
             var type = e.layerType,
