@@ -4,10 +4,10 @@
 	<title>Tree Map</title>
 	<meta charset="utf-8" />
 
-	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css" />
-	<script
-        src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js">
-    </script>
+	<link
+        rel="stylesheet" 
+        href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"
+    />
 	<!--[if lte IE 8]>
 	    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" />
 	<![endif]-->
@@ -35,11 +35,11 @@
 
 		#box {
 			display: inline-block;
-     		width: 50px;
+			width: 60px;
 			position: absolute; 
 			top: 10px; 
 			right: 10px; 
-			background-color: #F3F3F7; 
+			background-color: white; 
 			padding: 10px;
 			z-index: 1000;
 			opacity:0.8;
@@ -52,16 +52,12 @@
 
 		#box img {
 			display: inline-block;
-     		width: 20px;
-			margin-left: 10px;
-			margin-right: 10px;
+			width: 20px;
+			margin-left: 20px;
+			margin-right: 20px;
 			cursor: pointer;
-			text-align: center;
 			border-color: black;
-
-
 		}
-		
 	</style>
 </head>
 <body>
@@ -76,8 +72,8 @@
 
 
 	
-	<!-- <script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>-->
-	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"> </script>
+    <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
 	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 
 	<script>
@@ -103,20 +99,20 @@
 
 		var blackIcon = new poiIcon({iconUrl:'icons/poi_black.png'});
 		var redIcon   = new poiIcon({iconUrl:'icons/poi_red.png'});
-		var treeIcon  = new poiIcon({iconUrl:'icons/tree_green.png',shadowUrl:'icons/tree_shadow.png'});
+		var treeIcon  = new poiIcon({iconUrl:'icons/tree_green.png'});
 		var iceIcon  = new poiIcon({iconUrl:'icons/ice.png'});
 		var airportIcon  = new poiIcon({iconUrl:'icons/airport.png'});
 
 		// Mapquest layer
-		var mapquest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
-        		maxZoom: 18,
-				attribution: "©<a href='http://openstreetmap.org/' target='_blank'>OpenStreetMap</a> contributors, Tiles Courtesy of <a href='http://open.mapquest.com' target='_blank'>MapQuest</a>", 
-				subdomains: ["otile1", "otile2", "otile3", "otile4"]
-			});
+		var mapquest = new L.TileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+			maxZoom: 18, 
+			attribution: "©<a href='http://openstreetmap.org/' target='_blank'>OpenStreetMap</a> contributors, Tiles Courtesy of <a href='http://open.mapquest.com' target='_blank'>MapQuest</a>", 
+			subdomains: ['1','2','3','4']
+		});
 
 		// Init application
 		$(document).ready(function() {
-
+			//On-hover
 			$('#box').hover(
 		         function () {
 		           $(this).css({"opacity":"1.0"});
@@ -125,7 +121,7 @@
 		           $(this).css({"opacity":"0.4"});
 		         }
 		     );
-		 	
+
 			$( "#box.img" ).hover(function() {
 			  $( this ).fadeOut( 100 );
 			  $( this ).fadeIn( 500 );
@@ -167,14 +163,8 @@
 						map.containerPointToLatLng([ui.offset.left, ui.offset.top]),
 						options
 					);
-
 				}
-			});
-			// Enable drag and zoom handlers.
-			map.dragging.enable();
-			map.touchZoom.enable();
-			map.doubleClickZoom.enable();
-			map.scrollWheelZoom.enable();			
+			});			
 		});
 
 		// GET points
@@ -217,11 +207,9 @@
 
 					point.on('dragend', function(evt){
 						updatePoint(point);
-						map.tap.enable();
 					});
 
 					markers.push(point);
-					map.tap.enable();
 				}
 			});
 		}
@@ -377,7 +365,6 @@
 		function guid() {
 			return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 		}
-
 		
 	</script>
 </body>
