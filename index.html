@@ -3,17 +3,13 @@
 <head>
     <title>Real estate management has never been easier..</title>
     <meta charset="utf-8" />
-<<<<<<< HEAD
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
-    <link 
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" /> <link
         rel="stylesheet" 
         href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"
     />
-=======
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
     <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="leaflet.draw.css" />
->>>>>>> 0d22eff15218533df042be3a0d6e369980ce695b
     <link type="text/css" rel="stylesheet" href="bootstrap.css" />
     <link type="text/css" rel="stylesheet" href="easyestate.css">
 </head>
@@ -37,6 +33,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
     <script src="leaflet.draw.js"></script>
+    <script src="leaflet-button-control.js"></script>
     <script type="text/javascript" src="leaflet.markercluster.js"></script>
     <script src="https://rawgithub.com/brunob/leaflet.fullscreen/master/Control.FullScreen.js"></script>
     <script src="sample-geojson.js"></script>
@@ -93,6 +90,22 @@
             maxZoom: 18,
             }).addTo(map);
 
+            var myButtonOptions = {
+                'text': 'MyButton',  // string
+                'iconUrl': 'icons/poi_red.png',  // string
+                'onClick': my_button_onClick,  // callback function
+                'hideText': true,  // bool
+                'maxWidth': 30,  // number
+                'doToggle': false,  // bool
+                'toggleStatus': false  // bool
+            }   
+
+        var myButton = new L.Control.Button(myButtonOptions).addTo(map);
+
+        function my_button_onClick() {
+                console.log("someone clicked my button");
+        }
+
         // Initialise the FeatureGroup to store editable layers
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
@@ -104,6 +117,24 @@
             }
         });
         map.addControl(drawControl);
+
+        //New custom control
+        var MyControl = L.Control.extend({
+            options: {
+                position: 'topright'
+            },
+
+            onAdd: function (map) {
+                // create the control container with a particular class name
+                var container = L.DomUtil.create('div', 'my-custom-control');
+
+                // ... initialize other DOM elements, add listeners, etc.
+
+                return container;
+            }
+    });
+
+    map.addControl(new MyControl());
 
         map.on('draw:created', function (e) {
             var type = e.layerType,

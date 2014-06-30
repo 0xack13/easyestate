@@ -36,34 +36,43 @@
 			position: absolute; 
 			top: 10px; 
 			right: 10px; 
-			background-color: white; 
+			background-color: #F3F3F7; 
 			padding: 10px;
 			z-index: 1000;
 			opacity:0.8;
 			border: 2px solid; border-radius: 15px;
 			text-align: center;
+			border-width: thin;
+			border-style:solid;
+			border-color: gray;
 		}
 
 		#box img {
 			display: inline-block;
      		width: 20px;
-			margin-left: 20px;
-			margin-right: 5px;
+			margin-left: 10px;
+			margin-right: 10px;
 			cursor: pointer;
 			text-align: center;
+			border-color: black;
+
+
 		}
 		
 	</style>
 </head>
 <body>
 	<div id="map"></div>
-	<div id="box"><!-- Drag Marker on the map: --> 
-		<span class="poi-type"><img class="drag" type="tree" src="icons/tree_green.png" alt="TREE: green" />Tree</span>
-		<span class="poi-type"><img class="drag" type="red" src="icons/poi_red.png" alt="POI: red" />Red</span>
-		<span class="poi-type"><img class="drag" type="black" src="icons/poi_black.png" alt="POI: black" />Black</span>
-		<span class="poi-type"><img class="drag" type="ice" src="icons/ice.png" alt="POI: ice" />House</span>
+	<div id="box">
+		<span class="poi-type"><img class="drag" type="tree" src="icons/tree_green.png" alt="TREE: green" /></span>
+		<span class="poi-type"><img class="drag" type="red" src="icons/poi_red.png" alt="POI: red" /></span>
+		<span class="poi-type"><img class="drag" type="black" src="icons/poi_black.png" alt="POI: black" /></span>
+		<span class="poi-type"><img class="drag" type="ice" src="icons/ice.png" alt="POI: ice" /></span>
+		<span class="poi-type"><img class="drag" type="airport" src="icons/airport.png" alt="POI: airport" /></span>
 	</div>
 
+
+	
 	<script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
 	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
 	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
@@ -93,13 +102,14 @@
 		var redIcon   = new poiIcon({iconUrl:'icons/poi_red.png'});
 		var treeIcon  = new poiIcon({iconUrl:'icons/tree_green.png',shadowUrl:'icons/tree_shadow.png'});
 		var iceIcon  = new poiIcon({iconUrl:'icons/ice.png'});
+		var airportIcon  = new poiIcon({iconUrl:'icons/airport.png'});
 
 		// Mapquest layer
-		var mapquest = new L.TileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
-			maxZoom: 18, 
-			attribution: "©<a href='http://openstreetmap.org/' target='_blank'>OpenStreetMap</a> contributors, Tiles Courtesy of <a href='http://open.mapquest.com' target='_blank'>MapQuest</a>", 
-			subdomains: ['1','2','3','4']
-		});
+		var mapquest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
+        		maxZoom: 18,
+				attribution: "©<a href='http://openstreetmap.org/' target='_blank'>OpenStreetMap</a> contributors, Tiles Courtesy of <a href='http://open.mapquest.com' target='_blank'>MapQuest</a>", 
+				subdomains: ["otile1", "otile2", "otile3", "otile4"]
+			});
 
 		// Init application
 		$(document).ready(function() {
@@ -127,7 +137,7 @@
 			});
 
 			map = new L.Map('map', {
-				center: new L.LatLng(34.68, 135.18), 
+				center: new L.LatLng(39.61, -105.02), 
 				zoom: 16,
 				layers: [mapquest],
 				zoomControl: true
@@ -154,8 +164,14 @@
 						map.containerPointToLatLng([ui.offset.left, ui.offset.top]),
 						options
 					);
+
 				}
-			});			
+			});
+			// Enable drag and zoom handlers.
+			map.dragging.enable();
+			map.touchZoom.enable();
+			map.doubleClickZoom.enable();
+			map.scrollWheelZoom.enable();			
 		});
 
 		// GET points
@@ -198,9 +214,11 @@
 
 					point.on('dragend', function(evt){
 						updatePoint(point);
+						map.tap.enable();
 					});
 
 					markers.push(point);
+					map.tap.enable();
 				}
 			});
 		}
