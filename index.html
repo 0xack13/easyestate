@@ -5,9 +5,9 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
     <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="leaflet.draw.css" />
-    <link type="text/css" rel="stylesheet" href="bootstrap.css" />
-    <link type="text/css" rel="stylesheet" href="easyestate.css">
+    <link rel="stylesheet" href="css/leaflet.draw.css" />
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.css" />
+    <link type="text/css" rel="stylesheet" href="css/easyestate.css">
 </head>
 <body>
 
@@ -28,10 +28,10 @@
     </script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
-    <script src="leaflet.draw.js"></script>
-    <script type="text/javascript" src="leaflet.markercluster.js"></script>
+    <script src="js/leaflet.draw.js"></script>
+    <script type="text/javascript" src="js/leaflet.markercluster.js"></script>
     <script src="https://rawgithub.com/brunob/leaflet.fullscreen/master/Control.FullScreen.js"></script>
-    <script src="sample-geojson.js"></script>
+    <script src="data/sample-geojson.js"></script>
     <!-- <script type="easyestate.js"></script> -->
     <script>
         var newUser, users, mapquest, firstLoad;
@@ -181,7 +181,7 @@
         //Geojson GET call
         $.ajax({
             type: "get",
-            url: "http://localhost:8000/rows.json",
+            url: "http://localhost:8000/data/rows.json",
             dataType: 'json',
             success: function (response) {
 
