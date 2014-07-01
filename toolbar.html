@@ -1,0 +1,371 @@
+<!DOCTYPE html >
+<html>
+<head>
+	<title>Tree Map</title>
+	<meta charset="utf-8" />
+
+	<link
+        rel="stylesheet" 
+        href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"
+    />
+	<!--[if lte IE 8]>
+	    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" />
+	<![endif]-->
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+
+	<style>
+		* {
+			padding: 0;
+			margin: 0;
+		}
+
+		body,html {
+			height: 100%;
+		}
+
+		#map {
+			width: 100%;
+			height: 100%;
+			min-height: 100%;
+		}
+
+		* html #map {
+			height: 100%;
+		}
+
+		#box {
+			display: inline-block;
+			width: 60px;
+			position: absolute; 
+			top: 10px; 
+			right: 10px; 
+			background-color: white; 
+			padding: 10px;
+			z-index: 1000;
+			opacity:0.8;
+			border: 2px solid; border-radius: 15px;
+			text-align: center;
+			border-width: thin;
+			border-style:solid;
+			border-color: gray;
+		}
+
+		#box img {
+			display: inline-block;
+			width: 20px;
+			margin-left: 20px;
+			margin-right: 20px;
+			cursor: pointer;
+			border-color: black;
+		}
+	</style>
+</head>
+<body>
+	<div id="map"></div>
+	<div id="box">
+		<span class="poi-type"><img class="drag" type="tree" src="icons/tree_green.png" alt="TREE: green" /></span>
+		<span class="poi-type"><img class="drag" type="red" src="icons/poi_red.png" alt="POI: red" /></span>
+		<span class="poi-type"><img class="drag" type="black" src="icons/poi_black.png" alt="POI: black" /></span>
+		<span class="poi-type"><img class="drag" type="ice" src="icons/ice.png" alt="POI: ice" /></span>
+		<span class="poi-type"><img class="drag" type="airport" src="icons/airport.png" alt="POI: airport" /></span>
+	</div>
+
+
+	
+	<script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"> </script>
+    <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+
+	<script>
+		var gs = {
+			wfs: 'http://lab.georepublic.info/geoserver/grp/wfs',
+			ows: 'http://lab.georepublic.info/geoserver/grp/ows'
+		};
+
+		// Configure map
+		var map, user;
+		var markers = [];
+
+		var poiIcon = L.Icon.extend({
+		    options: {
+		        iconSize: [22,32],
+		        iconAnchor: [-20,0],
+		        shadowUrl: 'icons/poi_shadow.png',
+		        shadowSize: [22,13],
+		        shadowAnchor: [-31,-19],
+		        popupAnchor: [32,-2]
+		    }
+		});
+
+		var blackIcon = new poiIcon({iconUrl:'icons/poi_black.png'});
+		var redIcon   = new poiIcon({iconUrl:'icons/poi_red.png'});
+		var treeIcon  = new poiIcon({iconUrl:'icons/tree_green.png'});
+		var iceIcon  = new poiIcon({iconUrl:'icons/ice.png'});
+		var airportIcon  = new poiIcon({iconUrl:'icons/airport.png'});
+
+		// Mapquest layer
+		var mapquest = new L.TileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+			maxZoom: 18, 
+			attribution: "©<a href='http://openstreetmap.org/' target='_blank'>OpenStreetMap</a> contributors, Tiles Courtesy of <a href='http://open.mapquest.com' target='_blank'>MapQuest</a>", 
+			subdomains: ['1','2','3','4']
+		});
+
+		// Init application
+		$(document).ready(function() {
+			//On-hover
+			$('#box').hover(
+		         function () {
+		           $(this).css({"opacity":"1.0"});
+		         }, 
+		         function () {
+		           $(this).css({"opacity":"0.4"});
+		         }
+		     );
+
+			$( "#box.img" ).hover(function() {
+			  $( this ).fadeOut( 100 );
+			  $( this ).fadeIn( 500 );
+			});
+
+			// Assign points to users
+			$.get('http://api.hostip.info/get_json.php',function(json){
+				user = json;
+
+				// Load user points
+				loadPoints();
+			});
+
+			map = new L.Map('map', {
+				center: new L.LatLng(39.61, -105.02), 
+				zoom: 16,
+				layers: [mapquest],
+				zoomControl: true
+			});
+
+			// Drag & Drop
+			$(".drag").draggable({
+				helper: 'clone',
+				containment: 'map',
+				start: function(evt, ui) {
+					$('#box').fadeTo('fast', 0.6, function() {});
+				},
+				stop: function(evt, ui) {
+					$('#box').fadeTo('fast', 1.0, function() {});
+
+					var options = {
+						pid: guid(),
+						type: ui.helper.attr('type'),
+						icon: eval(ui.helper.attr('type') + 'Icon'),
+						draggable: true
+					};
+
+					insertPoint(
+						map.containerPointToLatLng([ui.offset.left, ui.offset.top]),
+						options
+					);
+				}
+			});			
+		});
+
+		// GET points
+		function loadPoints() {
+
+			var maxFeatures = 50;
+			var params = '?service=WFS&version=1.1.0&request=GetFeature&typeName=grp:points'
+							+ '&outputFormat=json&sortBy=created+D&maxFeatures=' + maxFeatures
+							+ '&filter=<PropertyIsEqualTo><PropertyName>ip</PropertyName><Literal>' 
+							+ user.ip + '</Literal></PropertyIsEqualTo>';
+
+			$.get(gs.ows + params, function(json){
+
+				// Remove all markers
+				for(i=0;i<markers.length;i++) {
+					map.removeLayer(markers[i]);
+				}
+				markers = [];
+
+				// Add markers
+				for(i=0;i<json.features.length;i++) {
+
+					var ftr = json.features[i];
+
+					var options = {
+						pid: ftr.properties.pid,
+						type: ftr.properties['class'],
+						icon: eval(ftr.properties['class'] + 'Icon'),
+						draggable: true
+					};
+
+					var point = L.marker([ftr.geometry.coordinates[0],ftr.geometry.coordinates[1]],options).addTo(map);
+					point.bindPopup(
+						'<a onClick="deletePoint(\'' + point.options.pid 
+							+ '\');" href="#">Remove Me!</a>',
+						{
+							closeButton: false
+						}
+					);
+
+					point.on('dragend', function(evt){
+						updatePoint(point);
+					});
+
+					markers.push(point);
+				}
+			});
+		}
+
+		// INSERT point
+		function insertPoint(position,options) {
+
+			var point = L.marker(position,options).addTo(map);
+			point.bindPopup(
+				'<a onClick="deletePoint(\'' + point.options.pid 
+					+ '\');" href="#">Remove Me!</a>',
+				{
+					closeButton: false
+				}
+			);
+
+			point.on('dragend', function(evt){
+				updatePoint(point);
+			});
+
+			markers.push(point);
+
+			var postData = 
+				'<wfs:Transaction\n'
+			  + '  service="WFS"\n'
+			  + '  version="1.1.0"\n'
+			  + '  xmlns:grp="http://lab.georepublic.info"\n'
+			  + '  xmlns:wfs="http://www.opengis.net/wfs"\n'
+			  + '  xmlns:gml="http://www.opengis.net/gml"\n'
+			  + '  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
+			  + '  xsi:schemaLocation="http://www.opengis.net/wfs\n'
+			  + '                      http://schemas.opengis.net/wfs/1.1.0/WFS-transaction.xsd\n'
+			  + '                      http://lab.georepublic.info/geoserver/grp/wfs/DescribeFeatureType?typename=grp:points">\n'
+			  + '  <wfs:Insert>\n'
+			  + '    <grp:points>\n'
+			  + '      <grp:pid>' + point.options.pid + '</grp:pid>\n'
+			  + '      <grp:class>' + point.options.type + '</grp:class>\n'
+			  + '      <grp:ip>' + user.ip + '</grp:ip>\n'
+			  + '      <grp:the_geom>\n'
+			  + '        <gml:Point srsDimension="2" srsName="urn:x-ogc:def:crs:EPSG:4326">\n'
+			  + '          <gml:coordinates decimal="." cs="," ts=" ">' + point.getLatLng().lat + ',' + point.getLatLng().lng + '</gml:coordinates>\n'
+			  + '        </gml:Point>\n'
+			  + '      </grp:the_geom>\n'
+			  + '    </grp:points>\n'
+			  + '  </wfs:Insert>\n'
+			  + '</wfs:Transaction>';
+
+			$.ajax({
+				type: "POST",
+				url: gs.wfs,
+				dataType: "xml",
+				contentType: "text/xml",
+				data: postData,
+				//TODO: Error handling
+				success: function(xml) {	
+					//TODO: User feedback
+				}
+			});
+		}
+
+		// UPDATE point
+		function updatePoint(point) {
+
+			var postData = 
+				'<wfs:Transaction\n'
+			  + '  service="WFS"\n'
+			  + '  version="1.1.0"\n'
+			  + '  xmlns:grp="http://lab.georepublic.info"\n'
+			  + '  xmlns:wfs="http://www.opengis.net/wfs"\n'
+			  + '  xmlns:ogc="http://www.opengis.net/ogc"\n'
+			  + '  xmlns:gml="http://www.opengis.net/gml"\n'
+			  + '  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
+			  + '  xsi:schemaLocation="http://www.opengis.net/wfs\n'
+			  + '                      http://schemas.opengis.net/wfs/1.1.0/WFS-transaction.xsd">\n'
+			  + '  <wfs:Update typeName="grp:points">\n'
+			  + '    <wfs:Property>\n'
+			  + '      <wfs:Name>the_geom</wfs:Name>\n'
+			  + '      <wfs:Value>\n'
+			  + '        <gml:Point srsDimension="2" srsName="urn:x-ogc:def:crs:EPSG:4326">\n'
+			  + '          <gml:coordinates decimal="." cs="," ts=" ">' + point.getLatLng().lat + ',' + point.getLatLng().lng + '</gml:coordinates>\n'
+			  + '        </gml:Point>\n'
+			  + '      </wfs:Value>\n'
+			  + '    </wfs:Property>\n'
+			  + '    <ogc:Filter>\n'
+			  + '      <PropertyIsEqualTo>\n'
+			  + '        <PropertyName>pid</PropertyName>\n'
+			  + '        <Literal>' + point.options.pid + '</Literal>\n'
+			  + '      </PropertyIsEqualTo>\n'
+			  + '    </ogc:Filter>\n'
+			  + '  </wfs:Update>\n'
+			  + '</wfs:Transaction>';
+
+			$.ajax({
+				type: "POST",
+				url: gs.wfs,
+				dataType: "xml",
+				contentType: "text/xml",
+				data: postData,
+				//TODO: Error handling
+				success: function(xml) {	
+					//TODO: User feedback
+				}
+			});
+		}
+
+		// DELETE point
+		function deletePoint(pid) {
+
+			for(i=0;i<markers.length;i++) {
+				if(markers[i].options.pid === pid) {
+					map.removeLayer(markers[i]);
+					markers.splice(i, 1);
+				}
+			}
+
+			var postData = 
+				'<wfs:Transaction\n'
+			  + '  service="WFS"\n'
+			  + '  version="1.1.0"\n'
+			  + '  xmlns:grp="http://lab.georepublic.info"\n'
+			  + '  xmlns:wfs="http://www.opengis.net/wfs"\n'
+			  + '  xmlns:ogc="http://www.opengis.net/ogc"\n'
+			  + '  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
+			  + '  xsi:schemaLocation="http://www.opengis.net/wfs\n'
+			  + '                      http://schemas.opengis.net/wfs/1.1.0/WFS-transaction.xsd">\n'
+			  + '  <wfs:Delete typeName="grp:points">\n'
+			  + '    <ogc:Filter>\n'
+			  + '      <PropertyIsEqualTo>\n'
+			  + '        <PropertyName>pid</PropertyName>\n'
+			  + '        <Literal>' + pid + '</Literal>\n'
+			  + '      </PropertyIsEqualTo>\n'
+			  + '    </ogc:Filter>\n'
+			  + '  </wfs:Delete>\n'
+			  + '</wfs:Transaction>';
+
+			$.ajax({
+				type: "POST",
+				url: gs.wfs,
+				dataType: "xml",
+				contentType: "text/xml",
+				data: postData,
+				//TODO: Error handling
+				success: function(xml) {	
+					//TODO: User feedback
+				}
+			});
+		}
+
+		// Create a GUID
+		function S4() {
+			return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+		}
+		function guid() {
+			return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+		}
+		
+	</script>
+</body>
+</html>
