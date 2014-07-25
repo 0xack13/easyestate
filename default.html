@@ -31,7 +31,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">BootLeaf</a>
+        <a class="navbar-brand" href="#">Estate Management</a>
       </div>
       <div class="navbar-collapse collapse">
         <form class="navbar-form navbar-right" role="search">
@@ -75,8 +75,9 @@
           <div class="panel-body">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" id="poi-tabs">
-              <li class="active"><a href="#theaters" onclick="$('#poi-tabs a[href=\'#theaters\']').tab('show'); return false;"><img src="assets/img/theater.png" height="16px" width="14px">&nbsp;Theaters</a></li>
-              <li><a href="#museums" onclick="$('#poi-tabs a[href=\'#museums\']').tab('show'); return false;"><img src="assets/img/museum.png" height="16px" width="14px">&nbsp;Museums</a></li>
+              <li class="active"><a href="#theaters" onclick="$('#poi-tabs a[href=\'#theaters\']').tab('show'); return false;"><img src="images/theater.png" height="16px" width="14px">&nbsp;</a></li>
+              <li><a href="#museums" onclick="$('#poi-tabs a[href=\'#museums\']').tab('show'); return false;"><img src="images/museum.png" height="16px" width="14px">&nbsp;Museums</a></li>
+              <li><a href="#lands" onclick="$('#poi-tabs a[href=\'#lands\']').tab('show'); return false;"><img src="images/museum.png" height="16px" width="14px">&nbsp;Lands</a></li>
             </ul>
             <!-- Tab panes -->
             <div class="tab-content">
@@ -93,6 +94,28 @@
                 </p>
                 <div class="sidebar-table">
                   <table class="table table-hover" id="theater-table">
+                    <thead class="hidden">
+                      <tr>
+                        <th>Name</th>
+                      <tr>
+                    </thead>
+                    <tbody class="list"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="tab-pane" id="museums">
+                <p>
+                  <div class="row">
+                    <div class="col-xs-8 col-md-8">
+                      <input type="text" class="form-control search" placeholder="Search" />
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                      <button type="button" class="btn btn-primary pull-right sort" data-sort="museum-name"><i class="fa fa-sort"></i>&nbsp;&nbsp;Sort</button>
+                    </div>
+                  </div>
+                </p>
+                <div class="sidebar-table">
+                  <table class="table table-hover" id="museum-table">
                     <thead class="hidden">
                       <tr>
                         <th>Name</th>
@@ -142,7 +165,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">Welcome to the BootLeaf template!</h4>
+            <h4 class="modal-title">Easyestate for better estate management</h4>
           </div>
           <div class="modal-body">
             <ul class="nav nav-tabs" id="aboutTabs">
