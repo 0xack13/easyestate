@@ -227,7 +227,7 @@ var theaters = L.geoJson(null, {
   },
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.NAME + "</td></tr>" + "<tr><th>Phone</th><td>" + feature.properties.TEL + "</td></tr>" + "<tr><th>Address</th><td>" + feature.properties.ADDRESS1 + "</td></tr>" + "<tr><th>Website</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>uName</th><td>" + feature.properties.NAME + "</td></tr>" + "<tr><th>Phone</th><td>" + feature.properties.TEL + "</td></tr>" + "<tr><th>Address</th><td>" + feature.properties.ADDRESS1 + "</td></tr>" + "<tr><th>Website</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
       layer.on({
         click: function (e) {
           $("#feature-title").html(feature.properties.NAME);
@@ -241,7 +241,7 @@ var theaters = L.geoJson(null, {
           }));
         }
       });
-      $("#theater-table tbody").append('<tr style="cursor: pointer;" onclick="sidebarClick('+L.stamp(layer)+'); return false;"><td class="theater-name">'+layer.feature.properties.NAME+'<i class="fa fa-chevron-right pull-right"></td></tr>');
+      $("#theater-table tbody").append('<tr style="cursor: pointer;" onclick="sidebarClick('+L.stamp(layer)+'); return false;"><td class="theater-name">'+ layer.feature.properties.NAME+'<i class="fa fa-chevron-right pull-right"></td></tr>');
       theaterSearch.push({
         name: layer.feature.properties.NAME,
         address: layer.feature.properties.ADDRESS1,
@@ -278,7 +278,9 @@ var museums = L.geoJson(null, {
       var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.NAME + "</td></tr>" + "<tr><th>Phone</th><td>" + feature.properties.TEL + "</td></tr>" + "<tr><th>Address</th><td>" + feature.properties.ADRESS1 + "</td></tr>" + "<tr><th>Website</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
       layer.on({
         click: function (e) {
+          //Add data to the pop-up screen
           $("#feature-title").html(feature.properties.NAME);
+          //The content is added here!
           $("#feature-info").html(content);
           $("#featureModal").modal("show");
           highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
@@ -289,7 +291,8 @@ var museums = L.geoJson(null, {
           }));
         }
       });
-      $("#museum-table tbody").append('<tr style="cursor: pointer;" onclick="sidebarClick('+L.stamp(layer)+'); return false;"><td class="museum-name">'+layer.feature.properties.NAME+'<i class="fa fa-chevron-right pull-right"></td></tr>');
+      //Add data to museum tab
+      $("#museum-table tbody").append('<tr style="cursor: pointer;" onclick="sidebarClick('+L.stamp(layer)+'); return false;"><td class="museum-name">'+ layer.feature.properties.NAME+'<i class="fa fa-chevron-right pull-right"></td></tr>');
       museumSearch.push({
         name: layer.feature.properties.NAME,
         address: layer.feature.properties.ADRESS1,
@@ -419,8 +422,8 @@ var baseLayers = {
 
 var groupedOverlays = {
   "Points of Interest": {
-    "<img src='assets/img/theater.png' width='24' height='28'>&nbsp;Theaters": theaterLayer,
-    "<img src='assets/img/museum.png' width='24' height='28'>&nbsp;Museums": museumLayer
+    "<img src='assets/img/theater.png' width='24' height='28'>&nbsp;Houses": theaterLayer,
+    "<img src='assets/img/museum.png' width='24' height='28'>&nbsp;Lands": museumLayer
   },
   "Reference": {
     "Boroughs": boroughs,
